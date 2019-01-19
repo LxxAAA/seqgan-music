@@ -181,11 +181,11 @@ def main():
     # generate real validation data from true validation dataset
     eval_data_loader.create_batches(valid_file)
 
-    time = str(datetime.datetime.now())[:-7]
+    time = str(datetime.datetime.now())[:-7] #####################这一句在V1版本里，是没有的，就是给文本加一个时间
     log = open('save/experiment-log' + str(time) + '.txt', 'w')
-    log.write(str(config)+'\n')
-    log.write('D loss: original\n')
-    log.flush()
+    log.write(str(config)+'\n')################ 在LOG上写一些内容
+    log.write('D loss: original\n')############  
+    log.flush()################################
 
     #summary_writer = tf.summary.FileWriter('save/tensorboard/', graph=tf.get_default_graph())
 
@@ -193,9 +193,9 @@ def main():
         #  pre-train generator
         print 'Start pre-training...'
         log.write('pre-training...\n')
-        for epoch in xrange(PRE_GEN_EPOCH):
+        for epoch in xrange(PRE_GEN_EPOCH): ########################################生成器的预训练
             # calculate the loss by running an epoch
-            loss = pre_train_epoch(sess, generator, gen_data_loader)
+            loss = pre_train_epoch(sess, generator, gen_data_loader)##############这个pre_train_epoch在哪里？？？
 
             # measure bleu score with the validation set
             bleu_score = calculate_bleu(sess, generator, eval_data_loader)
@@ -210,10 +210,10 @@ def main():
             # generate 5 test samples per epoch
             # it automatically samples from the generator and postprocess to midi file
             # midi files are saved to the pre-defined folder
-            if epoch == 0:
+            if epoch == 0: ##开始
                 generate_samples(sess, generator, BATCH_SIZE, generated_num, negative_file)
                 POST.main(negative_file, 5, str(-1)+'_vanilla_', 'midi')
-            elif epoch == PRE_GEN_EPOCH - 1:
+            elif epoch == PRE_GEN_EPOCH - 1: ##结束
                 generate_samples(sess, generator, BATCH_SIZE, generated_num, negative_file)
                 POST.main(negative_file, 5, str(-PRE_GEN_EPOCH)+'_vanilla_', 'midi')
 
@@ -258,7 +258,7 @@ def main():
         # load checkpoint of pre-trained model
         load_checkpoint(sess, saver)
 
-    # 0.001 to 0.01
+    # 0.001 to 0.01     这个也是这个版本独有的！！！
     if config['x10adv_g'] == True:
         generator.learning_rate *= 10
 
@@ -303,6 +303,7 @@ def main():
         log.write(buffer + '\n')
         log.flush()
 
+        ####################################################### 这段也是新出的
         if config['infinite_loop'] is True:
             if bleu_score < config['loop_threshold']:
                 buffer = 'Mode collapse detected, restarting from pretrained model...'
