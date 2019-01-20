@@ -3,34 +3,37 @@ import cPickle
 import yaml
 import random
 
-with open("SeqGAN.yaml") as stream:
+with open("SeqGAN.yaml") as stream:#这个没变化
     try:
         config = yaml.load(stream)
     except yaml.YAMLError as exc:
         print(exc)
 
-class Gen_Data_loader():
+class Gen_Data_loader(): #主要是操作batch 
     def __init__(self, batch_size):
         self.batch_size = batch_size
         self.token_stream = []
 
-    def create_batches(self, data_file):
-        self.token_stream = []
-        with open(data_file, 'rb') as f:
+    def create_batches(self, data_file): #创建一个batch
+        self.token_stream = [] #token的英文是记号，这里应该是记号流，也就是那些音乐符号的流 吧
+        with open(data_file, 'rb') as f: #读取数据
             # load pickle data
             data = cPickle.load(f)
             for line in data:
                 parse_line = [int(x) for x in line]
-                self.token_stream.extend(parse_line)
-                # if len(parse_line) == config['SEQ_LENGTH']:
+                self.token_stream.extend(parse_line) #这个是新加入的，下面两行是筛选的
+                # if len(parse_line) == config['SEQ_LENGTH']:  
                 #     self.token_stream.append(parse_line)
         if len(self.token_stream) % (self.batch_size * config['SEQ_LENGTH']) != 0:
             self.token_stream = self.token_stream[:-(len(self.token_stream) % (self.batch_size * config['SEQ_LENGTH']))]
-        self.num_batch = int(len(self.token_stream) / (self.batch_size * config['SEQ_LENGTH']))
-        self.token_stream = np.reshape(self.token_stream, (-1, config['SEQ_LENGTH']))
-        np.random.shuffle(self.token_stream)
-        self.sequence_batch = np.array(np.split(self.token_stream, self.num_batch, 0))
-        np.random.shuffle(self.sequence_batch)
+        self.num_batch = int(len(self.token_stream) / (self.batch_size * config['SEQ_LENGTH'])) #batch的总数
+        ##这个和原版不太一样。因为它是传入的符号，以符号为单位，所以符号数目/batch大小*每一句的总长度
+        self.token_stream = np.reshape(self.token_stream, (-1, config['SEQ_LENGTH'])) 
+        
+        np.random.shuffle(self.token_stream)# 打乱    token_stream和sequnece_batch都是个啥鸭
+        
+        self.sequence_batch = np.array(np.split(self.token_stream, self.num_batch, 0)) #先分割再变成数组
+        np.random.shuffle(self.sequence_batch)#打乱                      
         self.pointer = 0
 
     def next_batch(self):
