@@ -49,7 +49,7 @@ class Gen_Data_loader(): #主要是操作batch
         self.sequence_batch = np.array(np.split(sequence, self.num_batch, 0))
 
 
-class Dis_realdataloader():
+class Dis_realdataloader(): ## 分为两个，是不是为了让读取更有效率，不需要同时读。
     def __init__(self, batch_size):
         self.batch_size = batch_size
         # self.sentences = np.array([])
@@ -90,13 +90,15 @@ class Dis_realdataloader():
         # shuffle then sort the label for batch discrimination
         sentences = np.reshape(self.sentences_batches, (-1, config['SEQ_LENGTH']))
         labels = np.reshape(self.labels_batches, (-1, 2))
-
+	
+	#先完全打乱
         shuffler = np.arange(sentences.shape[0])
         np.random.shuffle(shuffler)
         sentences = sentences[shuffler]
         labels = labels[shuffler]
 
-        sorter = np.argsort(labels[:, 1], kind='mergesort')
+        #再按照label，也就是类别分开，和基数排序差不多
+	sorter = np.argsort(labels[:, 1], kind='mergesort')
         sentences = sentences[sorter]
         labels = labels[sorter]
 
