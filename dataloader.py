@@ -2,6 +2,9 @@ import numpy as np
 import cPickle
 import yaml
 import random
+##########################################################
+##这块的主要差距，就在于因为是词，不是以句子为单位，所以以token为单位，进行batch的拆开，打乱，重组。
+##########################################################
 
 with open("SeqGAN.yaml") as stream:#这个没变化
     try:
