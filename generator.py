@@ -1,4 +1,5 @@
-import tensorflow as tf
+#今天搞定这个G，差不多就可以了。那G和D就都看完了 
+import tensorflow as tf 
 from tensorflow.python.ops import tensor_array_ops, control_flow_ops
 import yaml
 
@@ -10,10 +11,11 @@ with open("SeqGAN.yaml") as stream:
 
 print config
 
-class Generator(object):
+class Generator(object):# 生成器
     def __init__(self, num_emb, batch_size, emb_dim, hidden_dim,
                  sequence_length, start_token,
-                 learning_rate=config['generator_lr'], reward_gamma=0.95):
+                 learning_rate=config['generator_lr'], reward_gamma=0.95): 
+        #emb的数目？batchsize的大小， emb的维度 ，隐藏层的维度 seq长度 起始token等等
         self.num_emb = num_emb
         self.batch_size = batch_size
         self.emb_dim = emb_dim
